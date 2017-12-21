@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			.searcher {
+ background: rgba(255, 255, 255, 0);
+ position: fixed;
+ z-index: 999;
+ width: 100%;
+ height: 6rem;
+ text-align: center;
+ font-size: 1.6rem;
+}
+ 
+.searcher-main {
+ background: #F4F4F4;
+ position: absolute;
+ left: 50%;
+ top: 1.2rem;
+ margin-left: -45%;
+ border-radius: 1.6rem;
+ width: 80%;
+ height: 3rem;
+ line-height: 3rem;
+}    
+ 
+.searcher-text {
+ width: 80%;
+ text-align: center;
+ border: none;
+ outline: none;
+ background: #F4F4F4;
+}
+ 
+.searcher-cancel {
+ position: absolute;
+ width: 10%;
+ height: 3rem;
+ line-height: 3rem;
+ color: #929292;
+ top: 1.2rem;
+ right: 1rem;
+}
+		</style>
+	</head>
+	<body>
+		<p class="searcher">
+  <p class="searcher-main">
+   <input class="searcher-text" placeholder="请输入档口名称"></input>
+  </p>
+  <p class="searcher-cancel">取消</p>
+</p>
+<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>		
+<script>
+	//监听input框，实时渲染
+$('.searcher-text').on('input', function() {
+ initSearchList();
+ });
+ 
+ 
+ //渲染搜索列表
+function initSearchList() {
+ var List = $('.searcher-land ul');
+ var params = {};
+ //搜索过滤字符
+ var SEARCH_KEY = $('.searcher-text').val()
+ params['action'] = 'get_search_key_list';
+ params['market_iid'] = 1001;
+ params['search_type'] = TYPE;
+ params['search_key'] = replaceIllegalStr(SEARCH_KEY);
+ 
+ $.ajax(params, function(result) {
+  console.log(result);
+  console.log(TYPE)
+  var html = '';
+  List.html('');
+  //有结果
+  if(result.data.length > 0) {
+   $.each(result.data, function(index, value) {
+    goodName = value['goods_name'];
+    shopName = value['shop_name'];
+    //判断Name类型
+    itemName = (goodName) ? goodName : shopName;
+    html += '<li class="goods-list">' + itemName + '</li>'
+   });
+   $('.searcher-list').html(html);
+  }
+  //无结果
+  else {
+   html = '<p class="no-goods">暂时无法找到此选项~</p>';
+   $('.searcher-list').html(html);
+  }
+ });
+}
+
+
+function replaceIllegalStr(str) {
+ var reg;
+ var illegal_list = ["/", "\\",
+  "[", "]",
+  "{", "}",
+  "<", ">",
+  "＜", "＞",
+  "「", "」",
+  "：", "；",
+  "、", "•",
+  "^", "'", "\"",
+  "\r", "\r\n", "\\n", "\n"];
+ for (var i = 0; i < illegal_list.length; i++) {
+  if (str.indexOf(illegal_list[i]) >= 0) {
+   if (illegal_list[i] == '\\' || illegal_list[i] == '[') {
+    reg = new RegExp('\\' + illegal_list[i], "g");
+   } else {
+    reg = new RegExp(illegal_list[i], "g");
+   }
+   str = str.replace(reg, '');
+  }
+ }
+ return str.trim();
+}
+
+
+//设置缓存
+ $.setLocalItem = function(key, value) {
+  if (window.localStorage) {
+   localStorage.setItem(key, value);
+  } else {
+   //后备方案
+   setCookie(key, value);
+  }
+ };
+ 
+ 
+ //提取缓存
+ $.getLocalItem = function(key) {
+  if (window.localStorage) {
+   return localStorage.getItem(key);
+  } else {
+   //后备方案
+   return getCookie(key);
+  }
+ };
+ 
+ //删除缓存
+ $.removeLocalItem = function(key) {
+  if (window.localStorage) {
+   localStorage.removeItem(key);
+  } else {
+   //后备方案
+   removeCookie(key);
+  }
+ };
+</script>		
+		
+	</body>
+</html>

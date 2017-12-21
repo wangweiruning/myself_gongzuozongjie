@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script src="js/jquery-3.1.1.min.js"></script>
+		<script src="js/cityselect/cityselect.js"></script>
+		<script type="text/javascript" src="http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js"></script>
+<script>
+	var myprovince = remote_ip_info['province']; 
+	var mycity = remote_ip_info['city'] 
+	var mydistrict = remote_ip_info['district']; 
+	
+		$(function(){ alert(myprovince+"====="+mycity+"====="+mydistrict)
+		    $("#city_1").citySelect({ 
+		        prov:myprovince,  
+		        city:mycity 
+		    }); 
+		    
+});
+</script>
+	</head>
+	<body>
+		<h3>调用新浪IP库接口</h3> 
+<p>您所在的城市是：<script>document.write(myprovince+' '+mycity);</script></p> 
+<div id="city_1"> 
+    <select class="prov"></select>  
+    <select class="city"></select> 
+</div>
+	</body>
+</html>

@@ -1,0 +1,13 @@
+{
+	"index.html": {
+		"resources": [
+			"exif.js",
+			"jquery-3.1.1.min.js"
+		]
+	},
+	"new_file.html": {
+		"resources": [
+			"jquery-3.1.1.min.js"
+		]
+	}
+}

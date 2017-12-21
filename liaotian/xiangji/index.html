@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<script src="jquery-3.1.1.min.js"></script>
+		<script src="exif.js"></script>
+		
+	</head>
+	<body>
+		<input type="file" capture=camera accept="image/*">//相机
+		<input type="file" accept="image/*">//相册
+		<script type="text/javascript">
+			$('input[type=file]').change(function(e) {
+			  var file = this.files[0];
+			  var mime_type=file.type;
+			  var orientation=0;
+			  if (file && /^image\//i.test(file.type)) {
+			    EXIF.getData(file,function(){
+			      orientation=EXIF.getTag(file,'Orientation');
+			    });
+			 
+			    var reader = new FileReader();
+			    reader.onloadend = function () {
+			      var width,height;
+			      var MAX_WH=800;
+			      var image=new Image();
+			      image.onload=function () {
+			        if(image.height > MAX_WH) {
+			          // 宽度等比例缩放 *= 
+			          image.width *= MAX_WH / image.height;
+			          image.height = MAX_WH;
+			        }
+			        if(image.width > MAX_WH) {
+			          // 宽度等比例缩放 *= 
+			          image.height *= MAX_WH / image.width;
+			          image.width = MAX_WH;
+			        }
+			        //压缩
+			        var quality=80;
+			        var cvs = document.createElement('canvas');
+			        cvs.width = width = image.width;
+			        cvs.height =height = image.height;
+			 
+			        switch (orientation) {
+			          case 6:
+			          case 8:
+			            cvs.width = height;
+			            cvs.height = width;
+			            break;
+			        }
+			 
+			        var context=cvs.getContext("2d");
+			 
+			        //解决ios图片旋转问题 
+			        switch(orientation){
+			          //iphone横屏拍摄，此时home键在左侧
+			          case 3:
+			          // 180度向左旋转
+			          context.translate(width, height);
+			          context.rotate(Math.PI);
+			          break;
+			          //iphone竖屏拍摄，此时home键在下方(正常拿手机的方向)
+			          case 6:
+			          context.rotate(0.5 * Math.PI);
+			          context.translate(0, -height);
+			          break;
+			          //iphone竖屏拍摄，此时home键在上方
+			          case 8:
+			          // 逆时针旋转90度
+			          context.rotate(-0.5 * Math.PI);
+			          context.translate(-width, 0);
+			          break;
+			        }
+			        context.drawImage(image, 0, 0,image.width, image.height);
+			        dataURL = cvs.toDataURL('image/jpeg', quality/100);
+			        //获取识别结果
+
+			      }
+			      image.src=dataURL;
+			    };
+			    reader.readAsDataURL(file);
+			  }else{
+			    alert("只能识别图片！")
+			  }
+			});
+
+ 
+		</script>
+	</body>
+</html>
